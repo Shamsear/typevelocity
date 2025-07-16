@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeVelocity - Futuristic Typing Platform</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzYzNjZmMSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjIiIHk9IjQiIHdpZHRoPSIyMCIgaGVpZ2h0PSIxNiIgcng9IjIiPjwvcmVjdD48cGF0aCBkPSJNNiA4aDQiPjwvcGF0aD48cGF0aCBkPSJNMTQgOGg0Ij48L3BhdGg+PHBhdGggZD0iTTggMTJoOCI+PC9wYXRoPjxwYXRoIGQ9Ik04IDE2aDgiPjwvcGF0aD48L3N2Zz4=">
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#a855f7',
+                        accent: '#ec4899',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body.dark {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+        }
+        
+        body.light {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        }
+    </style>
+</head>
+<body class="dark:text-light text-dark font-sans dark">
+    <!-- Ambient Background Elements -->
+    <div class="fixed inset-0 -z-10 overflow-hidden">
+        <div class="absolute top-10 left-10 w-64 h-64 rounded-full bg-primary/10 dark:bg-primary/10 blur-3xl"></div>
+        <div class="absolute bottom-10 right-10 w-80 h-80 rounded-full bg-accent/10 dark:bg-accent/10 blur-3xl"></div>
+        <div class="absolute top-1/2 left-1/3 w-72 h-72 rounded-full bg-secondary/10 dark:bg-secondary/10 blur-3xl"></div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="glassmorphism float-card rounded-2xl p-4 mb-8 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="text-2xl font-bold bg-gradient-to-r from-primary to-accent text-transparent bg-clip-text">TypeVelocity</div>
+                <div class="hidden md:block text-xs text-gray-400">The Future of Typing</div>
+            </div>
+            <div class="flex items-center space-x-6">
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-700/20">
+                    <!-- Sun icon (for dark mode) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <!-- Moon icon (for light mode) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                </button>
+                
+                <!-- User Profile Button -->
+                <button id="profile-button" class="p-1 rounded-full hover:bg-gray-700/20 relative">
+                    <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary user-avatar-container">
+                        <img id="user-avatar-header" alt="User Avatar" class="w-full h-full object-cover">
+                    </div>
+                </button>
+                
+                <div class="hidden md:flex items-center space-x-2 group relative">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs font-bold text-white level-display">1</div>
+                    <div class="text-sm">Level <span class="level-display">1</span></div>
+                    
+                    <!-- Level tooltip (shows on hover) -->
+                    <div class="absolute -bottom-20 left-0 w-48 p-2 bg-dark/90 dark:bg-dark/90 bg-white/90 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 text-xs z-10">
+                        <div class="flex justify-between mb-1">
+                            <span>Current Level:</span>
+                            <span class="font-semibold level-display">1</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>XP to Next Level:</span>
+                            <span class="font-semibold xp-to-next-level">100</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col w-32 md:w-48">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="xp-text">XP: 0</span>
+                        <span class="xp-max-text">100</span>
+                    </div>
+                    <div class="h-2 bg-gray-700 dark:bg-gray-700 bg-gray-200 rounded-full overflow-hidden">
+                        <div class="xp-bar h-full rounded-full" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Challenge Panel -->
+        <div class="glassmorphism float-card rounded-2xl p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-6 text-center bg-gradient-to-r from-primary to-accent text-transparent bg-clip-text">Typing Challenge</h2>
+            <div id="challenge-container" class="h-40 md:h-64 flex flex-col items-center justify-center border border-gray-700/50 dark:border-gray-700/50 border-gray-300/50 rounded-xl bg-dark/50 dark:bg-dark/50 bg-gray-100/50 mb-6 transition-all duration-300 relative overflow-hidden">
+                <div id="challenge-text-display" class="text-gray-400 dark:text-gray-400 text-gray-600 text-lg font-mono mb-4 w-full">
+                    Your typing challenge will appear here
+                </div>
+                <input id="typing-input" type="text" class="absolute opacity-0 h-0 w-full" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            </div>
+            <div class="flex justify-between text-sm text-gray-400 dark:text-gray-400 text-gray-600">
+                <div class="flex items-center">
+                    <span class="inline-block w-2 h-2 rounded-full bg-primary mr-2"></span>
+                    WPM: <span id="wpm-value" class="ml-1 font-semibold">--</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="inline-block w-2 h-2 rounded-full bg-secondary mr-2"></span>
+                    Accuracy: <span id="accuracy-value" class="ml-1 font-semibold">--%</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="inline-block w-2 h-2 rounded-full bg-accent mr-2"></span>
+                    Time: <span id="time-value" class="ml-1 font-semibold">--:--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Panel -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            <!-- Daily Goal -->
+            <div class="glassmorphism float-card rounded-xl p-4 flex flex-col justify-between">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-sm font-medium text-gray-400 dark:text-gray-400 text-gray-600">Today's Goal</h3>
+                    <span class="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">Daily</span>
+                </div>
+                <div class="my-2 text-lg font-semibold flex justify-between">
+                    <div>Type <span class="daily-goal">500</span> words</div>
+                    <div class="text-sm text-primary daily-goal-percentage">0%</div>
+                </div>
+                <div class="h-2 bg-gray-700 dark:bg-gray-700 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="daily-goal-bar bg-primary h-full rounded-full" style="width: 0%;"></div>
+                </div>
+                <div class="text-xs text-right mt-1 text-gray-400 dark:text-gray-400 text-gray-600 daily-goal-text">0/500 words</div>
+            </div>
+
+            <!-- XP Progress -->
+            <div class="glassmorphism float-card rounded-xl p-4 flex flex-col justify-between">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-sm font-medium text-gray-400 dark:text-gray-400 text-gray-600">Daily XP</h3>
+                    <div class="flex items-center">
+                        <span id="streak-badge" class="text-xs bg-yellow-500/20 text-yellow-500 px-2 py-0.5 rounded-full flex items-center">
+                            <span class="streak-count">0</span>
+                            <span class="ml-1">🔥</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between my-2">
+                    <div class="text-lg font-semibold daily-xp-text">0 XP</div>
+                    <div class="text-xs text-gray-400 dark:text-gray-400 text-gray-600">Goal: <span class="daily-xp-goal">200</span> XP</div>
+                </div>
+                <div class="h-2 bg-gray-700 dark:bg-gray-700 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="daily-xp-bar xp-bar h-full rounded-full" style="width: 0%;"></div>
+                </div>
+                <div class="text-xs text-right mt-1 text-gray-400 dark:text-gray-400 text-gray-600 streak-text">0 day streak</div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="glassmorphism float-card rounded-xl p-4 flex flex-col justify-between">
+                <button id="start-mission" class="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity rounded-lg py-3 font-semibold mb-3 flex items-center justify-center text-white">
+                    <span class="mr-2">Start Mission</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </button>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="show-leaderboard" class="glassmorphism hover:bg-white/10 transition-colors rounded-lg py-2 text-sm flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        Leaderboard
+                    </button>
+                    <button id="show-trophies" class="glassmorphism hover:bg-white/10 transition-colors rounded-lg py-2 text-sm flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                        Trophy Wall
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <div class="fixed bottom-0 left-0 right-0 z-10 p-4">
+        <div class="container mx-auto max-w-6xl">
+            <div class="glassmorphism rounded-xl p-2 flex justify-around items-center">
+                <button id="nav-training" class="nav-btn active flex flex-col items-center p-2 rounded-lg w-1/3 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span class="text-xs font-medium">Training</span>
+                </button>
+                <button id="nav-leaderboard" class="nav-btn flex flex-col items-center p-2 rounded-lg w-1/3 text-gray-400 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <span class="text-xs font-medium">Leaderboard</span>
+                </button>
+                <button id="nav-trophies" class="nav-btn flex flex-col items-center p-2 rounded-lg w-1/3 text-gray-400 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                    </svg>
+                    <span class="text-xs font-medium">Trophies</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Screen -->
+    <div id="leaderboard-screen" class="screen-container hidden">
+        <div class="container mx-auto px-4 py-8 max-w-6xl">
+            <!-- Header -->
+            <header class="glassmorphism float-card rounded-2xl p-4 mb-8 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="text-2xl font-bold bg-gradient-to-r from-primary to-accent text-transparent bg-clip-text">Leaderboard</div>
+                    <div class="hidden md:block text-xs text-gray-400">Global Rankings</div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Filter Options -->
+                    <div class="flex space-x-2">
+                        <button class="leaderboard-filter active px-3 py-1 text-xs rounded-full bg-primary/20 text-primary">Daily</button>
+                        <button class="leaderboard-filter px-3 py-1 text-xs rounded-full bg-gray-700/30 text-gray-400">Weekly</button>
+                        <button class="leaderboard-filter px-3 py-1 text-xs rounded-full bg-gray-700/30 text-gray-400">All-time</button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Leaderboard Table -->
+            <div class="glassmorphism float-card rounded-2xl p-6">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700/50 text-left">
+                                <th class="pb-3 pl-4 w-12 text-gray-400">#</th>
+                                <th class="pb-3 text-gray-400">User</th>
+                                <th class="pb-3 text-gray-400 text-center">Level</th>
+                                <th class="pb-3 text-gray-400 text-center">WPM</th>
+                                <th class="pb-3 text-gray-400 text-center">Accuracy</th>
+                                <th class="pb-3 pr-4 text-gray-400 text-center">Streak</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-table-body">
+                            <!-- Leaderboard entries will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 text-center text-sm text-gray-400">
+                    <p>Keep practicing to climb the ranks!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trophy Wall Screen -->
+    <div id="trophy-wall-screen" class="screen-container hidden">
+        <div class="container mx-auto px-4 py-8 max-w-6xl">
+            <!-- Header -->
+            <header class="glassmorphism float-card rounded-2xl p-4 mb-8 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="text-2xl font-bold bg-gradient-to-r from-primary to-accent text-transparent bg-clip-text">Trophy Wall</div>
+                    <div class="hidden md:block text-xs text-gray-400">Your Achievements</div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm">
+                        <span class="text-gray-400">Completed:</span>
+                        <span id="achievements-count" class="ml-1 font-semibold">0/12</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Achievements Grid -->
+            <div class="glassmorphism float-card rounded-2xl p-6">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="achievements-grid">
+                    <!-- Achievement cards will be dynamically inserted here -->
+                </div>
+                <div class="mt-6 text-center text-sm text-gray-400">
+                    <p>Complete challenges to unlock more achievements!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="results-modal" class="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glassmorphism rounded-2xl p-6 w-11/12 max-w-md transform scale-95 opacity-0 transition-all duration-300" id="modal-content">
+            <div class="text-center mb-6" id="modal-title">
+                <span class="text-2xl font-bold bg-gradient-to-r from-primary to-accent text-transparent bg-clip-text mb-1">Challenge Complete!</span>
+                <p class="text-gray-400 dark:text-gray-400 text-gray-600 text-sm">Here's how you performed</p>
+            </div>
+            
+            <!-- Results Stats -->
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-primary" id="result-wpm">0</div>
+                    <div class="text-xs text-gray-400">WPM</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-secondary" id="result-accuracy">0%</div>
+                    <div class="text-xs text-gray-400">Accuracy</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-accent" id="result-errors">0</div>
+                    <div class="text-xs text-gray-400">Errors</div>
+                </div>
+            </div>
+            
+            <!-- Progress Insights -->
+            <div class="mb-6 p-4 rounded-xl bg-dark/20 dark:bg-dark/20 bg-gray-100/50">
+                <h3 class="text-sm font-semibold mb-2 text-primary">Insights</h3>
+                <div id="typing-insights" class="text-sm">
+                    <!-- Insights will be dynamically inserted here -->
+                </div>
+            </div>
+            
+            <!-- XP Earned -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="text-sm">XP Earned</div>
+                <div class="flex items-center">
+                    <div class="w-5 h-5 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs font-bold text-white mr-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        </svg>
+                    </div>
+                    <span id="result-xp" class="font-semibold">0 XP</span>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-2 gap-4">
+                <button id="retry-challenge" class="glassmorphism hover:bg-white/10 transition-colors rounded-lg py-3 text-sm flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Try Again
+                </button>
+                <button id="close-modal" class="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity rounded-lg py-3 text-sm font-semibold flex items-center justify-center text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Continue
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Selection Modal -->
+    <div id="profile-modal" class="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glassmorphism rounded-2xl p-6 w-11/12 max-w-lg transform scale-95 opacity-0 transition-all duration-300" id="profile-modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-primary to-accent text-transparent bg-clip-text">Choose Avatar</h2>
+                <button id="close-profile-modal" class="p-2 rounded-full hover:bg-gray-700/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <p class="text-sm text-gray-400 mb-4">Choose your avatar:</p>
+            
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="avatar-option selected" data-avatar="default">
+                    <div class="w-20 h-20 rounded-full overflow-hidden border-2 border-primary mx-auto">
+                        <img id="default-avatar" alt="Default Avatar" class="w-full h-full object-cover">
+                    </div>
+                    <p class="text-xs text-center mt-2">Default</p>
+                </div>
+                <div class="avatar-option" data-avatar="astro">
+                    <div class="w-20 h-20 rounded-full overflow-hidden border-2 border-transparent mx-auto">
+                        <img id="astro-avatar" alt="Astro Avatar" class="w-full h-full object-cover">
+                    </div>
+                    <p class="text-xs text-center mt-2">Astro</p>
+                </div>
+                <div class="avatar-option" data-avatar="ninja">
+                    <div class="w-20 h-20 rounded-full overflow-hidden border-2 border-transparent mx-auto">
+                        <img id="ninja-avatar" alt="Ninja Avatar" class="w-full h-full object-cover">
+                    </div>
+                    <p class="text-xs text-center mt-2">Ninja</p>
+                </div>
+                <div class="avatar-option" data-avatar="robot">
+                    <div class="w-20 h-20 rounded-full overflow-hidden border-2 border-transparent mx-auto">
+                        <img id="robot-avatar" alt="Robot Avatar" class="w-full h-full object-cover">
+                    </div>
+                    <p class="text-xs text-center mt-2">Robot</p>
+                </div>
+                <div class="avatar-option" data-avatar="gamer">
+                    <div class="w-20 h-20 rounded-full overflow-hidden border-2 border-transparent mx-auto">
+                        <img id="gamer-avatar" alt="Gamer Avatar" class="w-full h-full object-cover">
+                    </div>
+                    <p class="text-xs text-center mt-2">Gamer</p>
+                </div>
+                <div class="avatar-option" data-avatar="coder">
+                    <div class="w-20 h-20 rounded-full overflow-hidden border-2 border-transparent mx-auto">
+                        <img id="coder-avatar" alt="Coder Avatar" class="w-full h-full object-cover">
+                    </div>
+                    <p class="text-xs text-center mt-2">Coder</p>
+                </div>
+            </div>
+            
+            <div class="flex justify-end">
+                <button id="save-avatar" class="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity rounded-lg py-2 px-4 text-sm font-semibold text-white">
+                    Save Avatar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/avatars.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html> 
