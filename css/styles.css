@@ -92,8 +92,6 @@ body.light .active-challenge {
     padding: 20px;
     box-sizing: border-box;
     width: 100%;
-    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
-    position: relative;
 }
 
 /* Typing Character Styles */
@@ -108,7 +106,7 @@ body.light .active-challenge {
     opacity: 0.4;
     font-weight: 300;
     margin: 0 1px;
-    color: transparent;
+    color: #a1a1aa;
 }
 
 .character.space.correct {
@@ -571,21 +569,6 @@ body {
     animation: pulse-dot 1.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
 }
 
-@keyframes pulse-dot {
-    0% {
-        transform: translateX(-50%) scale(0.8);
-        opacity: 0.8;
-    }
-    50% {
-        transform: translateX(-50%) scale(1.2);
-        opacity: 1;
-    }
-    100% {
-        transform: translateX(-50%) scale(0.8);
-        opacity: 0.8;
-    }
-}
-
 /* Fixed bottom navigation */
 .fixed-bottom-nav {
     position: fixed;
@@ -597,33 +580,11 @@ body {
     background: transparent;
 }
 
+
 /* Screen Container */
 .screen-container {
     padding-bottom: 100px; /* Space for bottom navigation */
     min-height: calc(100vh - 100px); /* Adjust for nav bar height */
-}
-
-/* Main Container */
-.container {
-    padding-bottom: 100px; /* Space for bottom navigation */
-    transition: opacity 0.3s ease;
-}
-
-/* Screen Transitions */
-.screen-container, .container {
-    transition: opacity 0.3s ease;
-}
-
-.screen-container.hidden, .container.hidden {
-    display: none;
-}
-
-/* Body and HTML for proper scrolling */
-html, body {
-    height: 100%;
-    overflow-x: hidden;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
 }
 
 /* Leaderboard Styles */
@@ -648,293 +609,74 @@ html, body {
     background-color: rgba(var(--color-primary-rgb, 99, 102, 241), 0.1);
 }
 
-/* Cancel Button Styles */
-#cancel-mission {
-    transform: scale(1);
-    transition: all 0.2s ease;
-    box-shadow: 0 0 0 rgba(239, 68, 68, 0.4);
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    z-index: 30;
-}
-
-#cancel-mission:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
-}
-
-#cancel-mission:active {
-    transform: scale(0.95);
-}
-
-#cancel-mission svg {
-    filter: drop-shadow(0 0 1px rgba(239, 68, 68, 0.8));
-}
-
-/* Animation for cancel button appearance */
-@keyframes fadeInScale {
-    0% {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-#cancel-mission.visible {
-    animation: fadeInScale 0.3s ease forwards;
-    opacity: 1;
-    visibility: visible;
-} 
-
-/* Mobile-Friendly Responsive Layout Adjustments */
-@media (max-width: 640px) {
-    /* Smaller text and padding for mobile */
-    body {
-        font-size: 14px;
-    }
-    
-    /* Adjust header for mobile */
-    header.glassmorphism {
-        padding: 0.75rem;
-    }
-    
-    /* Make challenge container taller on mobile for better typing experience */
-    #challenge-container {
-        height: 50vh !important;
-        padding: 12px;
-    }
-    
-    #challenge-text-display {
-        padding: 1rem;
-        font-size: 0.9rem;
-    }
-    
-    /* Stack grid items vertically on small screens */
-    .grid-cols-3 {
-        grid-template-columns: 1fr !important;
-    }
-    
-    /* Adjust bottom navigation for mobile */
-    .fixed-bottom-nav {
-        padding-bottom: 0.5rem;
-    }
-    
-    /* Make modals take up more screen space on mobile */
-    #modal-content, #profile-modal-content {
-        width: 95% !important;
-        padding: 1rem !important;
-    }
-    
-    /* Adjust leaderboard table for mobile */
-    #leaderboard-screen table th, 
-    #leaderboard-screen table td {
-        padding: 0.5rem 0.25rem;
-        font-size: 0.8rem;
-    }
-    
-    /* Hide less important columns on mobile */
-    #leaderboard-screen table th:nth-child(5),
-    #leaderboard-screen table td:nth-child(5) {
-        display: none;
-    }
-    
-    /* Adjust avatar selection grid for mobile */
-    .avatar-option {
-        padding: 0.5rem;
-    }
-    
-    .avatar-option div {
-        width: 3rem !important;
-        height: 3rem !important;
-    }
-    
-    /* Improve touch targets for mobile */
-    button, .nav-btn, .leaderboard-filter {
-        min-height: 44px;
-    }
-    
-    /* Adjust modal stats for mobile */
-    #result-wpm, #result-accuracy, #result-errors {
-        font-size: 1.5rem !important;
-    }
-}
-
-/* Tablet-specific adjustments */
-@media (min-width: 641px) and (max-width: 1024px) {
-    /* Adjust challenge container for tablets */
-    #challenge-container {
-        height: 40vh !important;
-    }
-    
-    /* Make grid 2 columns instead of 3 on tablets */
-    .grid-cols-3 {
-        grid-template-columns: 1fr 1fr !important;
-    }
-    
-    /* Adjust avatar selection grid for tablets */
-    .avatar-option div {
-        width: 4rem !important;
-        height: 4rem !important;
-    }
-}
-
-/* Screen reader only class */
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
+/* Trophy Wall Styles */
+.achievement-card {
+    position: relative;
+    transition: all 0.3s ease;
     overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
 }
 
-/* Ensure keyboard focus is visible */
-:focus {
-    outline: 2px solid #6366f1;
-    outline-offset: 2px;
+.achievement-card:hover {
+    transform: translateY(-2px);
 }
 
-/* But hide focus outline for mouse users */
-:focus:not(:focus-visible) {
-    outline: none;
+.achievement-card.locked {
+    opacity: 0.5;
+    filter: grayscale(0.8);
 }
 
-/* Show focus outline only for keyboard navigation */
-:focus-visible {
-    outline: 2px solid #6366f1;
-    outline-offset: 2px;
-} 
-
-/* Reduced Motion Styles */
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-        animation-duration: 0.001s !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.001s !important;
-        scroll-behavior: auto !important;
-    }
+.achievement-card .achievement-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
 }
 
-/* Apply reduced motion styles when the class is present */
-.reduced-motion *, 
-.reduced-motion *::before, 
-.reduced-motion *::after {
-    animation-duration: 0.001s !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001s !important;
-    scroll-behavior: auto !important;
-} 
-
-/* Keyboard Heatmap Styles */
-#keyboard-heatmap {
-    max-width: 100%;
-    overflow-x: auto;
-}
-
-.key-cap {
-    min-width: 2rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-}
-
-body.light .key-cap {
-    border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-/* Error intensity colors */
-.key-cap.bg-red-500 {
-    color: white;
-    box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
-}
-
-.key-cap.bg-yellow-500 {
-    color: #1e293b;
-    box-shadow: 0 0 8px rgba(234, 179, 8, 0.5);
-}
-
-.key-cap.bg-green-500 {
-    color: white;
-    box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
-}
-
-body.light .key-cap.bg-red-500 {
-    color: white;
-}
-
-body.light .key-cap.bg-yellow-500 {
-    color: #1e293b;
-}
-
-body.light .key-cap.bg-green-500 {
-    color: white;
-}
-
-/* Mobile adjustments for keyboard heatmap */
-@media (max-width: 640px) {
-    #keyboard-heatmap {
-        transform: scale(0.8);
-        transform-origin: top center;
-    }
-    
-    .key-cap {
-        min-width: 1.5rem;
-        height: 1.5rem !important;
-        font-size: 0.6rem;
-    }
-} 
-
-/* Mini Keyboard Heatmap Styles */
-#mini-keyboard-heatmap {
+.achievement-card .achievement-progress {
     position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-    max-width: 90%;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+    border-radius: 0 3px 0 0;
 }
 
-.mini-key-cap {
-    min-width: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-}
-
-body.light .mini-key-cap {
-    border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-/* Mini-heatmap toggle button */
-#toggle-mini-heatmap {
-    opacity: 0.6;
-    z-index: 20;
-}
-
-#toggle-mini-heatmap:hover {
-    opacity: 1;
-}
-
-/* Animation for key errors */
-@keyframes keyError {
+/* Animation for new achievements */
+@keyframes achievementUnlock {
     0% {
-        transform: scale(1);
+        transform: scale(0.8);
+        opacity: 0;
     }
     50% {
-        transform: scale(1.2);
+        transform: scale(1.1);
     }
     100% {
         transform: scale(1);
+        opacity: 1;
     }
 }
 
-.key-error-animation {
-    animation: keyError 0.3s ease;
+.achievement-unlocked {
+    animation: achievementUnlock 0.5s ease forwards;
 } 
 
-/* Typing Focus Mode Styles - Completely removing all focus mode styles */ 
+/* Main Container */
+.container {
+    padding-bottom: 100px; /* Space for bottom navigation */
+    transition: opacity 0.3s ease;
+}
+
+/* Screen Transitions */
+.screen-container, .container {
+    transition: opacity 0.3s ease;
+}
+
+.screen-container.hidden, .container.hidden {
+    display: none;
+} 
+
+/* Body and HTML for proper scrolling */
+html, body {
+    height: 100%;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}

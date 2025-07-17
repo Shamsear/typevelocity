@@ -1,72 +1,47 @@
-# TypeVelocity - Futuristic Typing Platform
+# TypeVelocity
 
-TypeVelocity is a modern, VisionOS-inspired typing training platform designed to help users improve their typing speed and accuracy in an engaging environment.
+A futuristic, VisionOS-inspired typing training platform and game that helps users from beginners to advanced improve their typing through daily learning, missions, and immersive feedback.
+
+![TypeVelocity Screenshot](https://via.placeholder.com/800x450.png?text=TypeVelocity+Screenshot)
 
 ## Features
 
-- **Interactive Typing Challenges**: Practice typing with dynamic challenges
-- **Performance Tracking**: Monitor your WPM, accuracy, and improvement over time
-- **Gamification Elements**: Level up, earn XP, and unlock achievements
-- **Customizable Experience**: Choose avatars and themes to personalize your experience
-- **Responsive Design**: Works on desktop, tablet, and mobile devices
-- **Accessibility Support**: Keyboard navigation and screen reader compatibility
-- **Smooth Animations**: Visual feedback enhances the typing experience
-- **Sound Effects**: Audio cues provide feedback for typing actions
+- 🚀 **VisionOS-inspired UI**: Glassmorphism, floating panels, and ambient effects
+- 🎮 **Gamified Experience**: XP system, levels, daily goals, and missions
+- 📊 **Real-time Feedback**: WPM, accuracy, and detailed statistics
+- 🏆 **Achievements**: Trophy wall and leaderboard
+- 🧠 **Smart Learning**: Adaptive challenges and personalized feedback
+- 🌓 **Light/Dark Mode**: Beautiful interface in any lighting condition
 
-## Performance Optimization
+## Technologies Used
 
-TypeVelocity is optimized for performance in the following ways:
-
-1. **Efficient DOM Updates**: Character elements are reused rather than recreated for each typing session.
-
-2. **Debounced Event Handlers**: Input event handlers use debouncing to prevent excessive function calls.
-
-3. **Lazy Loading**: Non-critical resources are loaded only when needed.
-
-4. **Animation Optimization**: 
-   - CSS transitions are preferred over JavaScript animations when possible
-   - Hardware-accelerated properties (transform, opacity) are used for smooth animations
-   - Animations are disabled for users who prefer reduced motion
-
-5. **Memory Management**:
-   - Event listeners are properly cleaned up to prevent memory leaks
-   - Large data structures are efficiently managed
-
-6. **Caching Strategies**:
-   - User data is cached in localStorage to minimize API calls
-   - Frequently accessed DOM elements are cached in variables
-
-7. **Reduced Network Requests**:
-   - SVG icons are used instead of icon fonts or image files
-   - Base64 encoding for small images reduces HTTP requests
-
-8. **Optimized Audio**:
-   - Audio context is reused for all sound effects
-   - Sound effects are generated programmatically instead of loading audio files
-
-## Accessibility Features
-
-- **Keyboard Navigation**: Full keyboard support for all interactive elements
-- **ARIA Attributes**: Proper ARIA roles and labels for screen readers
-- **Focus Management**: Visible focus indicators and logical tab order
-- **Screen Reader Announcements**: Live regions for dynamic content updates
-- **Color Contrast**: Meets WCAG AA standards for text readability
-- **Responsive Design**: Adapts to different screen sizes and orientations
-
-## Browser Support
-
-TypeVelocity works in all modern browsers including:
-- Chrome/Edge (latest)
-- Firefox (latest)
-- Safari (latest)
-- Mobile browsers (iOS Safari, Android Chrome)
+- HTML5, CSS3, and JavaScript
+- TailwindCSS for styling
+- LocalStorage for saving user progress
+- (Coming soon) ChatGPT API integration for smart feedback
 
 ## Getting Started
 
-1. Clone the repository
+1. Clone this repository
 2. Open `index.html` in your browser
 3. Start typing to improve your skills!
 
+## Roadmap
+
+- [x] Basic UI layout with VisionOS-inspired design
+- [x] Light/Dark mode toggle
+- [x] User data management with LocalStorage
+- [ ] Typing challenge implementation
+- [ ] WPM and accuracy calculation
+- [ ] XP and level progression system
+- [ ] Missions and achievements
+- [ ] Leaderboard functionality
+- [ ] ChatGPT API integration for smart feedback
+
 ## License
 
-MIT License - Feel free to use, modify, and distribute this code. 
+MIT
+
+---
+
+Created with ❤️ by [Your Name] 

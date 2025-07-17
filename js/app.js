@@ -3,9 +3,6 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Reset user data for testing
-    resetUserData();
-    
     // Initialize the app
     initTheme();
     initUserData();
@@ -14,22 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
     initLeaderboard();
     initTrophyWall();
-    initAccessibility(); // Add accessibility features
-    initSoundEffects(); // Initialize sound effects
-    checkReducedMotion(); // Check for reduced motion preference
-    
-    // Initialize keyboard heatmap
-    if (window.keyboardHeatmap && typeof window.keyboardHeatmap.init === 'function') {
-        window.keyboardHeatmap.init();
-    }
 });
-
-/**
- * Reset user data for testing purposes
- */
-function resetUserData() {
-    localStorage.removeItem('typeVelocity_userData');
-}
 
 /**
  * Theme Management
@@ -145,9 +127,7 @@ function getDefaultUserData() {
             showWPM: true,
             focusMode: false,
             avatar: 'default', // Default avatar
-            theme: 'default', // Default theme
-            reducedMotion: false, // New preference for reduced motion
-            showMiniHeatmap: false // Preference for showing mini-heatmap
+            theme: 'default' // Default theme
         }
     };
 }
@@ -272,7 +252,7 @@ function updateUserUI(userData, leveledUp = false) {
     });
     
     // Update daily XP
-    const dailyXPPercentage = Math.min(100, Math.round((userData.dailyXP / userData.dailyXPGoal) * 100));
+    const dailyXPPercentage = Math.min(100, (userData.dailyXP / userData.dailyXPGoal) * 100);
     const dailyXPBars = document.querySelectorAll('.daily-xp-bar');
     dailyXPBars.forEach(bar => {
         animateProgressBar(bar, dailyXPPercentage);
@@ -459,24 +439,6 @@ function checkAchievements(userData, sessionData) {
             title: 'Prolific Writer',
             description: 'Type 10,000 words total',
             check: () => userData.totalWordsTyped >= 10000
-        },
-        {
-            id: 'level_5',
-            title: 'Rising Star',
-            description: 'Reach level 5',
-            check: () => userData.level >= 5
-        },
-        {
-            id: 'level_10',
-            title: 'Expert Typist',
-            description: 'Reach level 10',
-            check: () => userData.level >= 10
-        },
-        {
-            id: 'perfect_accuracy',
-            title: 'Flawless',
-            description: 'Complete a session with 100% accuracy',
-            check: () => sessionData.accuracy === 100 && sessionData.wpm > 0
         }
     ];
     
@@ -515,8 +477,6 @@ function checkAchievements(userData, sessionData) {
  */
 function initTypingChallenge() {
     const startMissionButton = document.getElementById('start-mission');
-    const cancelMissionButton = document.getElementById('cancel-mission');
-    const practiceModeButton = document.getElementById('practice-mode');
     const challengeContainer = document.getElementById('challenge-container');
     const challengeTextDisplay = document.getElementById('challenge-text-display');
     const inputField = document.getElementById('typing-input');
@@ -533,9 +493,6 @@ function initTypingChallenge() {
     let totalChars = 0;
     let isTypingActive = false;
     
-    // Make currentPrompt accessible globally for the keyboard heatmap
-    window.currentPrompt = '';
-    
     // Array of fallback typing prompts
     const fallbackPrompts = [
         "The quick brown fox jumps over the lazy dog. This pangram contains all the letters of the English alphabet.",
@@ -548,20 +505,6 @@ function initTypingChallenge() {
         "Life is 10% what happens to you and 90% how you react to it. Your reaction is your responsibility.",
         "The future belongs to those who believe in the beauty of their dreams. Dream big and work hard to achieve them.",
         "Coding is not just about writing code; it's about solving problems efficiently and elegantly. Think before you type."
-    ];
-    
-    // Practice mode prompts (shorter and simpler)
-    const practiceModePrompts = [
-        "The quick brown fox jumps over the lazy dog.",
-        "Practice makes perfect when learning to type.",
-        "Focus on accuracy first, then speed will follow.",
-        "Keep your fingers on the home row keys.",
-        "Look at the screen, not at your keyboard.",
-        "Type with rhythm to improve your speed.",
-        "Good posture helps prevent typing fatigue.",
-        "Take short breaks to rest your hands and eyes.",
-        "Learn keyboard shortcuts to boost productivity.",
-        "Consistent practice leads to typing mastery."
     ];
     
     // Challenge categories
@@ -580,16 +523,6 @@ function initTypingChallenge() {
         startNewChallenge();
     });
     
-    // Practice Mode button click event
-    practiceModeButton.addEventListener('click', () => {
-        startPracticeMode();
-    });
-    
-    // Cancel Mission button click event
-    cancelMissionButton.addEventListener('click', () => {
-        cancelChallenge();
-    });
-    
     // Input field event listeners
     inputField.addEventListener('input', handleTyping);
     inputField.addEventListener('paste', (e) => e.preventDefault()); // Prevent pasting
@@ -602,12 +535,6 @@ function initTypingChallenge() {
         
         // Show loading state
         showLoadingState();
-        
-        // Show cancel button
-        cancelMissionButton.classList.remove('opacity-0', 'invisible');
-        cancelMissionButton.classList.add('opacity-100', 'visible');
-        
-        // Enable focus mode - removed
         
         // Get a dynamic prompt from ChatGPT API
         fetchDynamicPrompt()
@@ -635,83 +562,6 @@ function initTypingChallenge() {
             });
     }
     
-    // Start practice mode with simpler prompts
-    function startPracticeMode() {
-        // Reset typing state
-        resetTypingState();
-        
-        // Show loading state (brief for practice mode)
-        challengeTextDisplay.innerHTML = `
-            <div class="flex flex-col items-center justify-center">
-                <p>Loading practice prompt...</p>
-            </div>
-        `;
-        
-        // Activate the challenge container
-        challengeContainer.classList.add('border-primary/50', 'dark:border-primary/50', 'active-challenge');
-        
-        // Show cancel button
-        cancelMissionButton.classList.remove('opacity-0', 'invisible');
-        cancelMissionButton.classList.add('opacity-100', 'visible');
-        
-        // Enable focus mode - removed
-        
-        // Select a random practice prompt
-        const randomIndex = Math.floor(Math.random() * practiceModePrompts.length);
-        currentPrompt = practiceModePrompts[randomIndex];
-        
-        // Initialize the challenge with the practice prompt
-        setTimeout(() => {
-            initializeChallenge(currentPrompt, true);
-        }, 500);
-    }
-    
-    // Cancel the current challenge
-    function cancelChallenge() {
-        // Reset typing state
-        resetTypingState();
-        
-        // Hide cancel button
-        cancelMissionButton.classList.add('opacity-0', 'invisible');
-        cancelMissionButton.classList.remove('opacity-100', 'visible');
-        
-        // Reset challenge container
-        challengeContainer.classList.remove('border-primary/50', 'dark:border-primary/50', 'active-challenge');
-        challengeContainer.classList.add('border-gray-700/50', 'dark:border-gray-700/50', 'border-gray-300/50');
-        
-        // Reset challenge text
-        challengeTextDisplay.innerHTML = `
-            <div class="text-gray-400 dark:text-gray-400 text-gray-600 text-lg font-mono">
-                Your typing challenge will appear here
-            </div>
-        `;
-        
-        // Reset stats display
-        wpmDisplay.textContent = '--';
-        accuracyDisplay.textContent = '--%';
-        timeDisplay.textContent = '--:--';
-        
-        // Reset start mission button
-        startMissionButton.innerHTML = `
-            <span class="mr-2">Start Mission</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-        `;
-        startMissionButton.disabled = false;
-        
-        // Reset practice mode button
-        practiceModeButton.innerHTML = `
-            <span class="mr-2">Practice Mode</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-            </svg>
-        `;
-        practiceModeButton.disabled = false;
-        
-        // Disable focus mode - removed
-    }
-    
     // Show loading state while fetching prompt
     function showLoadingState() {
         challengeTextDisplay.innerHTML = `
@@ -735,18 +585,13 @@ function initTypingChallenge() {
             </svg>
         `;
         
-        // Disable the buttons while loading
+        // Disable the button while loading
         startMissionButton.disabled = true;
-        practiceModeButton.disabled = true;
     }
     
     // Initialize the challenge with the provided prompt
-    function initializeChallenge(prompt, isPracticeMode = false) {
+    function initializeChallenge(prompt) {
         totalChars = prompt.length;
-        
-        // Set the current prompt and make it accessible globally
-        currentPrompt = prompt;
-        window.currentPrompt = prompt;
         
         // Format the challenge text with character spans
         // We'll wrap each word to prevent cutting off words at the edge
@@ -771,54 +616,32 @@ function initTypingChallenge() {
         // Update the challenge text display
         challengeTextDisplay.innerHTML = formattedText;
         
-        // Change button text based on mode
-        if (isPracticeMode) {
-            startMissionButton.innerHTML = `
-                <span class="mr-2">Start Mission</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-            `;
-            
-            practiceModeButton.innerHTML = `
-                <span class="mr-2">New Practice</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-            `;
-        } else {
-            startMissionButton.innerHTML = `
-                <span class="mr-2">Restart Mission</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-            `;
-            
-            practiceModeButton.innerHTML = `
-                <span class="mr-2">Practice Mode</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                </svg>
-            `;
-        }
+        // Change button text to "Restart Mission"
+        startMissionButton.innerHTML = `
+            <span class="mr-2">Restart Mission</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+        `;
         
-        // Re-enable the buttons
+        // Re-enable the button
         startMissionButton.disabled = false;
-        practiceModeButton.disabled = false;
         
         // Clear input field and focus it
         inputField.value = '';
         inputField.classList.remove('hidden');
         inputField.focus();
         
-        // Start the typing activity
-        startTime = new Date();
+        // Reset stats display
+        wpmDisplay.textContent = '0';
+        accuracyDisplay.textContent = '100%';
+        timeDisplay.textContent = '0:00';
+        
+        // Set typing as active
         isTypingActive = true;
         
-        // Start interval to update stats
-        if (typingInterval) {
-            clearInterval(typingInterval);
-        }
+        // Start the timer
+        startTime = new Date();
         typingInterval = setInterval(updateStats, 1000);
     }
     
@@ -917,17 +740,11 @@ function initTypingChallenge() {
         correctChars = 0;
         incorrectChars = 0;
         
-        // Track if the latest character was correct or incorrect
-        let lastCharWasCorrect = true;
-        
         // Compare input with prompt characters
         for (let i = 0; i < inputText.length; i++) {
             if (i < characters.length) {
                 const expectedChar = currentPrompt[i];
                 const actualChar = inputText[i];
-                
-                // Check if this is the last character typed
-                const isNewCharacter = i === inputText.length - 1;
                 
                 if (actualChar === expectedChar) {
                     // For correct spaces, keep the dot visible but mark as correct
@@ -938,24 +755,6 @@ function initTypingChallenge() {
                         characters[i].className = 'character correct';
                     }
                     correctChars++;
-                    
-                    // Play key press sound for the latest character
-                    if (isNewCharacter && window.soundEffects && window.soundEffects.keypress) {
-                        window.soundEffects.keypress();
-                    }
-                    
-                    // Add subtle animation to the character
-                    if (isNewCharacter) {
-                        characters[i].animate([
-                            { transform: 'scale(1.2)', opacity: '0.9' },
-                            { transform: 'scale(1)', opacity: '1' }
-                        ], {
-                            duration: 150,
-                            easing: 'ease-out'
-                        });
-                    }
-                    
-                    lastCharWasCorrect = true;
                 } else {
                     // For incorrect spaces, show a different indicator
                     if (expectedChar === ' ') {
@@ -965,27 +764,6 @@ function initTypingChallenge() {
                         characters[i].className = 'character incorrect';
                     }
                     incorrectChars++;
-                    
-                    // Play error sound for the latest character
-                    if (isNewCharacter && window.soundEffects && window.soundEffects.error) {
-                        window.soundEffects.error();
-                    }
-                    
-                    // Add shake animation to the character
-                    if (isNewCharacter) {
-                        characters[i].animate([
-                            { transform: 'translateX(-3px)' },
-                            { transform: 'translateX(3px)' },
-                            { transform: 'translateX(-2px)' },
-                            { transform: 'translateX(2px)' },
-                            { transform: 'translateX(0)' }
-                        ], {
-                            duration: 200,
-                            easing: 'ease-in-out'
-                        });
-                    }
-                    
-                    lastCharWasCorrect = false;
                 }
             }
         }
@@ -1043,10 +821,6 @@ function initTypingChallenge() {
         isTypingActive = false;
         clearInterval(typingInterval);
         
-        // Hide cancel button
-        cancelMissionButton.classList.add('opacity-0', 'invisible');
-        cancelMissionButton.classList.remove('opacity-100', 'visible');
-        
         // Calculate final stats
         const finalTime = (new Date() - startTime) / 1000; // in seconds
         const finalMinutes = finalTime / 60;
@@ -1057,11 +831,6 @@ function initTypingChallenge() {
         
         // Record session data
         const sessionData = recordSessionData(wpm, accuracy, errors, finalTime, currentPrompt);
-        
-        // Update keyboard heatmap with session errors
-        if (window.keyboardHeatmap && typeof window.keyboardHeatmap.updateSessionErrors === 'function') {
-            window.keyboardHeatmap.updateSessionErrors(currentPrompt, inputField.value);
-        }
         
         // Calculate XP based on performance
         // Formula: (WPM * Accuracy Multiplier * Challenge Length Multiplier * Streak Bonus)
@@ -1122,39 +891,8 @@ function initTypingChallenge() {
         // Hide input field
         inputField.classList.add('hidden');
         
-        // Add completion animation to challenge container
-        challengeContainer.animate([
-            { transform: 'scale(1)', boxShadow: '0 0 0 rgba(99, 102, 241, 0.5)' },
-            { transform: 'scale(1.02)', boxShadow: '0 0 30px rgba(99, 102, 241, 0.8)' },
-            { transform: 'scale(1)', boxShadow: '0 0 0 rgba(99, 102, 241, 0.5)' }
-        ], {
-            duration: 800,
-            easing: 'ease-in-out'
-        });
-        
-        // Play appropriate sound effect
-        if (window.soundEffects) {
-            // Play level up sound if leveled up
-            if (leveledUp && window.soundEffects.levelUp) {
-                window.soundEffects.levelUp();
-            } 
-            // Play achievement sound if new achievements
-            else if (newAchievements && newAchievements.length > 0 && window.soundEffects.achievement) {
-                window.soundEffects.achievement();
-            }
-            // Otherwise play completion sound
-            else if (window.soundEffects.complete) {
-                window.soundEffects.complete();
-            }
-        }
-        
-        // Announce completion to screen readers
-        announceToScreenReader(`Challenge complete! Your WPM is ${wpm} with ${accuracy}% accuracy. You earned ${earnedXP} XP.`);
-        
         // Show results modal with animation
-        setTimeout(() => {
-            showResultsModal(wpm, accuracy, errors, earnedXP, userData, newAchievements, leveledUp);
-        }, 500);
+        showResultsModal(wpm, accuracy, errors, earnedXP, userData, newAchievements, leveledUp);
     }
     
     // Reset typing state
@@ -1310,14 +1048,6 @@ function initProfileSystem() {
         setTimeout(() => {
             profileModalContent.classList.remove('scale-95', 'opacity-0');
             profileModalContent.classList.add('scale-100', 'opacity-100');
-            
-            // Set focus on first avatar option for keyboard accessibility
-            setTimeout(() => {
-                const firstAvatarOption = document.querySelector('.avatar-option');
-                if (firstAvatarOption) {
-                    firstAvatarOption.focus();
-                }
-            }, 100);
         }, 50);
     }
     
@@ -1416,11 +1146,6 @@ function showResultsModal(wpm, accuracy, errors, xp, userData, newAchievements =
     setTimeout(() => {
         modalContent.classList.remove('scale-95', 'opacity-0');
         modalContent.classList.add('scale-100', 'opacity-100');
-        
-        // Set focus on retry button for keyboard accessibility
-        setTimeout(() => {
-            retryButton.focus();
-        }, 100);
     }, 50);
     
     // Add event listeners to buttons
@@ -1537,9 +1262,9 @@ function initNavigation() {
     const screens = document.querySelectorAll('.screen-container');
     const mainContent = document.querySelector('.container');
     
-    // Remove references to the buttons we removed from HTML
-    // const showLeaderboardBtn = document.getElementById('show-leaderboard');
-    // const showTrophiesBtn = document.getElementById('show-trophies');
+    // Also handle the buttons in the bottom panel
+    const showLeaderboardBtn = document.getElementById('show-leaderboard');
+    const showTrophiesBtn = document.getElementById('show-trophies');
     
     // Navigation button click event
     navButtons.forEach(btn => {
@@ -1547,144 +1272,37 @@ function initNavigation() {
             // Get the target screen ID
             const targetId = btn.id.replace('nav-', '');
             
-            // Update active button with animation
-            navButtons.forEach(b => {
-                b.classList.remove('active');
-                b.classList.add('text-gray-400');
-                // Reset any animations
-                b.style.transform = '';
-                // Hide indicator
-                const indicator = b.querySelector('.nav-indicator');
-                if (indicator) {
-                    indicator.style.opacity = '0';
-                }
-            });
-            
-            // Add active class and animate the clicked button
+            // Update active button
+            navButtons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            btn.classList.remove('text-gray-400');
-            animateNavButton(btn);
             
-            // Show indicator for active tab
-            const indicator = btn.querySelector('.nav-indicator');
-            if (indicator) {
-                indicator.style.opacity = '1';
-                indicator.style.transition = 'opacity 0.3s ease';
-            }
-            
-            // Show the target screen, hide others with fade transition
+            // Show the target screen, hide others
             if (targetId === 'training') {
-                // Fade out other screens
+                // Show main content, hide other screens
+                mainContent.classList.remove('hidden');
+                screens.forEach(screen => screen.classList.add('hidden'));
+            } else {
+                // Hide main content, show target screen
+                mainContent.classList.add('hidden');
                 screens.forEach(screen => {
-                    if (!screen.classList.contains('hidden')) {
-                        fadeOut(screen, () => {
-                            screen.classList.add('hidden');
-                            fadeIn(mainContent);
-                        });
+                    if (screen.id === `${targetId}-screen`) {
+                        screen.classList.remove('hidden');
+                    } else {
+                        screen.classList.add('hidden');
                     }
                 });
-                
-                // Show main content
-                mainContent.classList.remove('hidden');
-            } else {
-                // Fade out main content if visible
-                if (!mainContent.classList.contains('hidden')) {
-                    fadeOut(mainContent, () => {
-                        mainContent.classList.add('hidden');
-                        
-                        // Show target screen
-                        screens.forEach(screen => {
-                            if (screen.id === `${targetId}-screen`) {
-                                screen.classList.remove('hidden');
-                                fadeIn(screen);
-                                console.log(`Showing ${targetId}-screen`);
-                                
-                                // If showing trophy wall, update it
-                                if (targetId === 'trophies') {
-                                    if (typeof window.updateTrophyWall === 'function') {
-                                        window.updateTrophyWall();
-                                        console.log('Updating trophy wall');
-                                    }
-                                }
-                            } else {
-                                screen.classList.add('hidden');
-                            }
-                        });
-                    });
-                } else {
-                    // Fade between screens
-                    screens.forEach(screen => {
-                        if (!screen.classList.contains('hidden')) {
-                            fadeOut(screen, () => {
-                                screen.classList.add('hidden');
-                                
-                                // Show target screen
-                                screens.forEach(s => {
-                                    if (s.id === `${targetId}-screen`) {
-                                        s.classList.remove('hidden');
-                                        fadeIn(s);
-                                        console.log(`Showing ${targetId}-screen`);
-                                        
-                                        // If showing trophy wall, update it
-                                        if (targetId === 'trophies') {
-                                            if (typeof window.updateTrophyWall === 'function') {
-                                                window.updateTrophyWall();
-                                                console.log('Updating trophy wall');
-                                            }
-                                        }
-                                    }
-                                });
-                            });
-                        }
-                    });
-                }
             }
         });
     });
     
-    // Remove event listeners for the buttons we removed
     // Bottom panel button events
-    // showLeaderboardBtn.addEventListener('click', () => {
-    //     document.getElementById('nav-leaderboard').click();
-    // });
+    showLeaderboardBtn.addEventListener('click', () => {
+        document.getElementById('nav-leaderboard').click();
+    });
     
-    // showTrophiesBtn.addEventListener('click', () => {
-    //     document.getElementById('nav-trophies').click();
-    // });
-    
-    // Helper function to animate the nav button
-    function animateNavButton(btn) {
-        btn.style.transform = 'scale(0.9)';
-        setTimeout(() => {
-            btn.style.transform = 'scale(1.05)';
-            setTimeout(() => {
-                btn.style.transform = '';
-            }, 150);
-        }, 150);
-    }
-    
-    // Helper function to fade out an element
-    function fadeOut(element, callback) {
-        element.style.opacity = '1';
-        element.style.transition = 'opacity 0.2s ease';
-        
-        setTimeout(() => {
-            element.style.opacity = '0';
-            setTimeout(() => {
-                if (callback) callback();
-            }, 200);
-        }, 10);
-    }
-    
-    // Helper function to fade in an element
-    function fadeIn(element) {
-        element.style.opacity = '0';
-        element.style.transition = 'opacity 0.2s ease';
-        
-        setTimeout(() => {
-            element.style.opacity = '1';
-        }, 10);
-    }
+    showTrophiesBtn.addEventListener('click', () => {
+        document.getElementById('nav-trophies').click();
+    });
 } 
 
 /**
@@ -1965,29 +1583,8 @@ function initTrophyWall() {
         }
     ];
     
-    // Add some starter achievements if the user doesn't have any
-    initializeStarterAchievements();
-    
     // Initialize trophy wall
     updateTrophyWall();
-    
-    // Initialize some starter achievements for new users
-    function initializeStarterAchievements() {
-        const userData = loadUserData();
-        
-        // If user has no achievements, add the first_session achievement
-        if (!userData.achievements || userData.achievements.length === 0) {
-            userData.achievements = [{
-                id: 'first_session',
-                title: 'First Steps',
-                description: 'Complete your first typing session',
-                dateEarned: new Date().toISOString()
-            }];
-            
-            // Save the updated user data
-            saveUserData(userData);
-        }
-    }
     
     // Update trophy wall display
     function updateTrophyWall() {
@@ -1995,19 +1592,11 @@ function initTrophyWall() {
         const userData = loadUserData();
         const userAchievements = userData.achievements || [];
         
-        // Check if elements exist
-        if (!achievementsGrid || !achievementsCount) {
-            console.error('Achievement elements not found in the DOM');
-            return;
-        }
-        
         // Update achievements count
         achievementsCount.textContent = `${userAchievements.length}/${allAchievements.length}`;
         
         // Clear grid
         achievementsGrid.innerHTML = '';
-        
-        console.log('Updating trophy wall with', userAchievements.length, 'achievements');
         
         // Add achievement cards
         allAchievements.forEach(achievement => {
@@ -2017,18 +1606,18 @@ function initTrophyWall() {
             
             // Create achievement card
             const card = document.createElement('div');
-            card.className = `achievement-card glassmorphism rounded-xl p-4 flex flex-col items-center text-center ${isUnlocked ? '' : 'locked'} transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg`;
+            card.className = `achievement-card glassmorphism rounded-xl p-4 flex flex-col items-center text-center ${isUnlocked ? '' : 'locked'}`;
             
             // Add achievement details
             card.innerHTML = `
-                <div class="achievement-icon mb-2 bg-gradient-to-br ${achievement.color} text-white w-12 h-12 rounded-full flex items-center justify-center text-xl">
+                <div class="achievement-icon mb-2 bg-gradient-to-br ${achievement.color} text-white w-12 h-12 rounded-full flex items-center justify-center">
                     ${achievement.icon}
                 </div>
                 <h3 class="text-sm font-semibold mb-1">${achievement.title}</h3>
                 <p class="text-xs text-gray-400 mb-2">${achievement.description}</p>
                 ${isUnlocked ? 
-                    `<div class="text-xs text-green-500 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Unlocked ${formatDate(userAchievement.dateEarned)}</div>` : 
-                    '<div class="text-xs text-gray-500 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg> Locked</div>'
+                    `<div class="text-xs text-green-500">Unlocked ${formatDate(userAchievement.dateEarned)}</div>` : 
+                    '<div class="text-xs text-gray-500">Locked</div>'
                 }
             `;
             
@@ -2043,11 +1632,13 @@ function initTrophyWall() {
         return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     }
     
-    // Make updateTrophyWall globally accessible
-    window.updateTrophyWall = updateTrophyWall;
+    // Update trophy wall when user earns a new achievement
+    window.updateTrophyWall = function() {
+        updateTrophyWall();
+    };
     
-    // Add a hook to the checkAchievements function
-    const originalCheckAchievements = window.checkAchievements || function() { return []; };
+    // Add a hook to the checkAchievements function to update the trophy wall
+    const originalCheckAchievements = window.checkAchievements || function() {};
     
     window.checkAchievements = function(userData, sessionData) {
         const newAchievements = originalCheckAchievements(userData, sessionData);
@@ -2062,397 +1653,3 @@ function initTrophyWall() {
         return newAchievements;
     };
 } 
-
-/**
- * Accessibility Improvements
- */
-function initAccessibility() {
-    // Add keyboard navigation for main buttons
-    const focusableElements = [
-        '#theme-toggle',
-        '#profile-button',
-        '#start-mission',
-        '#practice-mode',
-        '#nav-training',
-        '#nav-leaderboard',
-        '.leaderboard-filter',
-        '#retry-challenge',
-        '#close-modal',
-        '#close-profile-modal',
-        '#save-avatar',
-        '.avatar-option'
-    ];
-    
-    // Add keyboard navigation between main interactive elements
-    document.addEventListener('keydown', (e) => {
-        // ESC key to close modals
-        if (e.key === 'Escape') {
-            hideResultsModal();
-            hideProfileModal();
-            
-            // Cancel challenge if active
-            const cancelButton = document.getElementById('cancel-mission');
-            if (cancelButton.classList.contains('visible')) {
-                cancelChallenge();
-            }
-        }
-        
-        // Tab trap for modals
-        if (e.key === 'Tab') {
-            const resultsModal = document.getElementById('results-modal');
-            const profileModal = document.getElementById('profile-modal');
-            
-            // If results modal is open, trap focus inside it
-            if (!resultsModal.classList.contains('pointer-events-none')) {
-                trapFocusInModal(resultsModal, e);
-            }
-            
-            // If profile modal is open, trap focus inside it
-            if (!profileModal.classList.contains('pointer-events-none')) {
-                trapFocusInModal(profileModal, e);
-            }
-        }
-    });
-    
-    // Add ARIA roles and attributes to improve accessibility
-    addAriaAttributes();
-    
-    // Make avatar selection keyboard accessible
-    const avatarOptions = document.querySelectorAll('.avatar-option');
-    avatarOptions.forEach(option => {
-        option.setAttribute('tabindex', '0');
-        option.setAttribute('role', 'radio');
-        option.setAttribute('aria-checked', option.classList.contains('selected') ? 'true' : 'false');
-        
-        option.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                // Deselect all options
-                avatarOptions.forEach(opt => {
-                    opt.classList.remove('selected');
-                    opt.setAttribute('aria-checked', 'false');
-                    opt.querySelector('div').classList.remove('border-primary');
-                    opt.querySelector('div').classList.add('border-transparent');
-                });
-                
-                // Select this option
-                option.classList.add('selected');
-                option.setAttribute('aria-checked', 'true');
-                option.querySelector('div').classList.remove('border-transparent');
-                option.querySelector('div').classList.add('border-primary');
-            }
-        });
-    });
-}
-
-/**
- * Add ARIA roles and attributes to improve accessibility
- */
-function addAriaAttributes() {
-    // Navigation
-    const navTraining = document.getElementById('nav-training');
-    const navLeaderboard = document.getElementById('nav-leaderboard');
-    
-    navTraining.setAttribute('role', 'tab');
-    navTraining.setAttribute('aria-selected', 'true');
-    navLeaderboard.setAttribute('role', 'tab');
-    navLeaderboard.setAttribute('aria-selected', 'false');
-    
-    // Challenge container
-    const challengeContainer = document.getElementById('challenge-container');
-    challengeContainer.setAttribute('role', 'textbox');
-    challengeContainer.setAttribute('aria-label', 'Typing challenge area');
-    
-    // Buttons
-    document.getElementById('theme-toggle').setAttribute('aria-label', 'Toggle light/dark theme');
-    document.getElementById('profile-button').setAttribute('aria-label', 'Open profile settings');
-    document.getElementById('start-mission').setAttribute('aria-label', 'Start typing mission');
-    document.getElementById('practice-mode').setAttribute('aria-label', 'Start practice mode');
-    document.getElementById('cancel-mission').setAttribute('aria-label', 'Cancel current challenge');
-    
-    // Results modal
-    const resultsModal = document.getElementById('results-modal');
-    resultsModal.setAttribute('role', 'dialog');
-    resultsModal.setAttribute('aria-modal', 'true');
-    resultsModal.setAttribute('aria-labelledby', 'modal-title');
-    
-    // Profile modal
-    const profileModal = document.getElementById('profile-modal');
-    profileModal.setAttribute('role', 'dialog');
-    profileModal.setAttribute('aria-modal', 'true');
-    profileModal.setAttribute('aria-labelledby', 'profile-modal-title');
-    
-    // Leaderboard table
-    const leaderboardTable = document.querySelector('#leaderboard-screen table');
-    if (leaderboardTable) {
-        leaderboardTable.setAttribute('role', 'table');
-        leaderboardTable.setAttribute('aria-label', 'Typing performance leaderboard');
-    }
-    
-    // Add live region for announcements
-    const liveRegion = document.createElement('div');
-    liveRegion.setAttribute('aria-live', 'polite');
-    liveRegion.setAttribute('aria-atomic', 'true');
-    liveRegion.className = 'sr-only';
-    liveRegion.id = 'live-announcements';
-    document.body.appendChild(liveRegion);
-}
-
-/**
- * Trap focus inside modal dialogs for keyboard accessibility
- */
-function trapFocusInModal(modal, event) {
-    const focusableElements = modal.querySelectorAll('button, [tabindex="0"]');
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
-    
-    if (event.shiftKey && document.activeElement === firstElement) {
-        event.preventDefault();
-        lastElement.focus();
-    } else if (!event.shiftKey && document.activeElement === lastElement) {
-        event.preventDefault();
-        firstElement.focus();
-    }
-}
-
-/**
- * Announce messages to screen readers
- */
-function announceToScreenReader(message) {
-    const liveRegion = document.getElementById('live-announcements');
-    if (liveRegion) {
-        liveRegion.textContent = message;
-    }
-} 
-
-/**
- * Sound Effects System
- */
-function initSoundEffects() {
-    // Create audio context
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-    const audioContext = new AudioContext();
-    
-    // Create sound effects
-    const soundEffects = {
-        keypress: createKeyPressSound(audioContext),
-        error: createErrorSound(audioContext),
-        complete: createCompleteSound(audioContext),
-        levelUp: createLevelUpSound(audioContext),
-        achievement: createAchievementSound(audioContext),
-        click: createClickSound(audioContext)
-    };
-    
-    // Store in global scope for access from other functions
-    window.soundEffects = soundEffects;
-    
-    // Add click sound to buttons
-    addButtonSounds();
-}
-
-/**
- * Create a short key press sound
- */
-function createKeyPressSound(audioContext) {
-    return () => {
-        // Check if sound effects are enabled in user preferences
-        const userData = loadUserData();
-        if (!userData.preferences.soundEffects) return;
-        
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(440 + Math.random() * 80, audioContext.currentTime);
-        
-        gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.1);
-    };
-}
-
-/**
- * Create an error sound
- */
-function createErrorSound(audioContext) {
-    return () => {
-        // Check if sound effects are enabled in user preferences
-        const userData = loadUserData();
-        if (!userData.preferences.soundEffects) return;
-        
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(180, audioContext.currentTime + 0.2);
-        
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.2);
-    };
-}
-
-/**
- * Create a completion sound
- */
-function createCompleteSound(audioContext) {
-    return () => {
-        // Check if sound effects are enabled in user preferences
-        const userData = loadUserData();
-        if (!userData.preferences.soundEffects) return;
-        
-        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-        
-        notes.forEach((freq, i) => {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.type = 'sine';
-            oscillator.frequency.value = freq;
-            
-            gainNode.gain.setValueAtTime(0.0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + i * 0.1 + 0.05);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + i * 0.1 + 0.3);
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.start(audioContext.currentTime + i * 0.1);
-            oscillator.stop(audioContext.currentTime + i * 0.1 + 0.3);
-        });
-    };
-}
-
-/**
- * Create a level up sound
- */
-function createLevelUpSound(audioContext) {
-    return () => {
-        // Check if sound effects are enabled in user preferences
-        const userData = loadUserData();
-        if (!userData.preferences.soundEffects) return;
-        
-        // Play an ascending arpeggio
-        const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99]; // C4, E4, G4, C5, E5, G5
-        
-        notes.forEach((freq, i) => {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.type = 'sine';
-            oscillator.frequency.value = freq;
-            
-            gainNode.gain.setValueAtTime(0.0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + i * 0.08 + 0.05);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + i * 0.08 + 0.3);
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.start(audioContext.currentTime + i * 0.08);
-            oscillator.stop(audioContext.currentTime + i * 0.08 + 0.3);
-        });
-    };
-}
-
-/**
- * Create an achievement sound
- */
-function createAchievementSound(audioContext) {
-    return () => {
-        // Check if sound effects are enabled in user preferences
-        const userData = loadUserData();
-        if (!userData.preferences.soundEffects) return;
-        
-        // Play a celebratory sound
-        const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
-        
-        notes.forEach((freq, i) => {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.type = 'triangle';
-            oscillator.frequency.value = freq;
-            
-            gainNode.gain.setValueAtTime(0.0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + i * 0.12 + 0.05);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + i * 0.12 + 0.4);
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.start(audioContext.currentTime + i * 0.12);
-            oscillator.stop(audioContext.currentTime + i * 0.12 + 0.4);
-        });
-    };
-}
-
-/**
- * Create a button click sound
- */
-function createClickSound(audioContext) {
-    return () => {
-        // Check if sound effects are enabled in user preferences
-        const userData = loadUserData();
-        if (!userData.preferences.soundEffects) return;
-        
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.1);
-        
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.1);
-    };
-}
-
-/**
- * Add sound effects to buttons
- */
-function addButtonSounds() {
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(button => {
-        button.addEventListener('click', () => {
-            if (window.soundEffects && window.soundEffects.click) {
-                window.soundEffects.click();
-            }
-        });
-    });
-} 
-
-/**
- * Check if user prefers reduced motion
- */
-function checkReducedMotion() {
-    // Check for prefers-reduced-motion media query
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    
-    if (prefersReducedMotion) {
-        // Add a class to the body to disable animations
-        document.body.classList.add('reduced-motion');
-        
-        // Store the preference in user data
-        const userData = loadUserData();
-        userData.preferences.reducedMotion = true;
-        saveUserData(userData);
-    }
-}
