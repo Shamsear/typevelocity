@@ -60,6 +60,119 @@ body.light .active-challenge {
     background: rgba(99, 102, 241, 0.05);
 }
 
+/* Enhanced Challenge Loading Animation */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.challenge-loading {
+    background: linear-gradient(-45deg, #6366f1, #a855f7, #ec4899, #6366f1);
+    background-size: 400% 400%;
+    animation: gradientShift 3s ease infinite;
+}
+
+@keyframes loadingPulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+    }
+    
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+    }
+    
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+    }
+}
+
+.loading-spinner {
+    animation: loadingPulse 2s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+/* Text Reveal Animation */
+@keyframes textReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.character-reveal {
+    opacity: 0;
+    animation: textReveal 0.5s forwards;
+}
+
+.word {
+    display: inline-block;
+    margin-right: 0.25em;
+}
+
+/* Staggered character animation */
+.word .character:nth-child(1) { animation-delay: 0.02s; }
+.word .character:nth-child(2) { animation-delay: 0.04s; }
+.word .character:nth-child(3) { animation-delay: 0.06s; }
+.word .character:nth-child(4) { animation-delay: 0.08s; }
+.word .character:nth-child(5) { animation-delay: 0.10s; }
+.word .character:nth-child(6) { animation-delay: 0.12s; }
+.word .character:nth-child(7) { animation-delay: 0.14s; }
+.word .character:nth-child(8) { animation-delay: 0.16s; }
+.word .character:nth-child(9) { animation-delay: 0.18s; }
+.word .character:nth-child(10) { animation-delay: 0.20s; }
+.word .character:nth-child(11) { animation-delay: 0.22s; }
+.word .character:nth-child(12) { animation-delay: 0.24s; }
+.word .character:nth-child(13) { animation-delay: 0.26s; }
+.word .character:nth-child(14) { animation-delay: 0.28s; }
+.word .character:nth-child(15) { animation-delay: 0.30s; }
+.word .character:nth-child(n+16) { animation-delay: 0.32s; }
+
+/* Word animation staggering */
+.word:nth-child(1) .character { animation-delay: calc(var(--delay, 0s) + 0.02s); }
+.word:nth-child(2) .character { animation-delay: calc(var(--delay, 0s) + 0.04s); }
+.word:nth-child(3) .character { animation-delay: calc(var(--delay, 0s) + 0.06s); }
+.word:nth-child(4) .character { animation-delay: calc(var(--delay, 0s) + 0.08s); }
+.word:nth-child(5) .character { animation-delay: calc(var(--delay, 0s) + 0.10s); }
+.word:nth-child(6) .character { animation-delay: calc(var(--delay, 0s) + 0.12s); }
+.word:nth-child(7) .character { animation-delay: calc(var(--delay, 0s) + 0.14s); }
+.word:nth-child(8) .character { animation-delay: calc(var(--delay, 0s) + 0.16s); }
+.word:nth-child(9) .character { animation-delay: calc(var(--delay, 0s) + 0.18s); }
+.word:nth-child(10) .character { animation-delay: calc(var(--delay, 0s) + 0.20s); }
+.word:nth-child(n+11) .character { animation-delay: calc(var(--delay, 0s) + 0.22s); }
+
+/* Countdown animation */
+@keyframes countdownPulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    80% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+.countdown-number {
+    animation: countdownPulse 1s ease-out forwards;
+}
+
 #challenge-text-display {
     transition: all 0.3s ease;
     max-width: 100%;
@@ -92,6 +205,7 @@ body.light .active-challenge {
     padding: 20px;
     box-sizing: border-box;
     width: 100%;
+    position: relative;
 }
 
 /* Typing Character Styles */
@@ -248,7 +362,6 @@ body.light .character.incorrect {
 #typing-insights {
     animation: fadeIn 1s forwards;
     animation-delay: 0.8s;
-    opacity: 0;
 }
 
 /* Custom Scrollbar */
@@ -529,17 +642,10 @@ body {
 .nav-btn {
     position: relative;
     overflow: hidden;
-    transition: all 0.2s ease;
-    border-radius: 12px;
-}
-
-.nav-btn:active {
-    transform: scale(0.95);
 }
 
 .nav-btn.active {
     color: var(--color-primary);
-    background-color: rgba(255, 255, 255, 0.08);
 }
 
 .nav-btn.active::after {
@@ -551,40 +657,12 @@ body {
     height: 3px;
     background: var(--gradient-primary);
     border-radius: 3px 3px 0 0;
-    box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
 }
-
-.nav-btn:not(.active):hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    color: var(--color-secondary);
-}
-
-/* Navigation indicator dot */
-.nav-indicator {
-    transition: opacity 0.3s ease;
-    box-shadow: 0 0 5px var(--color-primary);
-}
-
-.nav-btn.active .nav-indicator {
-    animation: pulse-dot 1.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
-}
-
-/* Fixed bottom navigation */
-.fixed-bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 50;
-    padding-bottom: env(safe-area-inset-bottom, 0.5rem);
-    background: transparent;
-}
-
 
 /* Screen Container */
 .screen-container {
-    padding-bottom: 100px; /* Space for bottom navigation */
-    min-height: calc(100vh - 100px); /* Adjust for nav bar height */
+    padding-bottom: 80px; /* Space for bottom navigation */
+    min-height: 100vh;
 }
 
 /* Leaderboard Styles */
@@ -660,7 +738,7 @@ body {
 
 /* Main Container */
 .container {
-    padding-bottom: 100px; /* Space for bottom navigation */
+    padding-bottom: 80px; /* Space for bottom navigation */
     transition: opacity 0.3s ease;
 }
 
@@ -673,10 +751,63 @@ body {
     display: none;
 } 
 
-/* Body and HTML for proper scrolling */
-html, body {
-    height: 100%;
-    overflow-x: hidden;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
+/* Main Navigation Bar - Fixed to bottom */
+.fixed.bottom-0 {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    width: 100%;
+    padding-bottom: env(safe-area-inset-bottom, 0.5rem);
 }
+
+/* Ensure content doesn't get hidden behind the navigation bar */
+body {
+    padding-bottom: 100px;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Make sure the navigation bar is visible */
+.fixed.bottom-0 .glassmorphism {
+    opacity: 0.98;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.15);
+}
+
+body.light .fixed.bottom-0 .glassmorphism {
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced navigation styling */
+.nav-btn {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.nav-btn.active {
+    color: #6366f1;
+    transform: translateY(-2px);
+}
+
+.nav-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 3px;
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    border-radius: 1.5px;
+}
+
+.pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+/* Ensure the navigation bar stays above other elements */
+.fixed.bottom-0 .container {
+    z-index: 50;
+    height: 100px;
+} 

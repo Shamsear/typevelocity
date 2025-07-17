@@ -477,6 +477,7 @@ function checkAchievements(userData, sessionData) {
  */
 function initTypingChallenge() {
     const startMissionButton = document.getElementById('start-mission');
+    const cancelMissionButton = document.getElementById('cancel-mission');
     const challengeContainer = document.getElementById('challenge-container');
     const challengeTextDisplay = document.getElementById('challenge-text-display');
     const inputField = document.getElementById('typing-input');
@@ -523,6 +524,11 @@ function initTypingChallenge() {
         startNewChallenge();
     });
     
+    // Cancel Mission button click event
+    cancelMissionButton.addEventListener('click', () => {
+        cancelChallenge();
+    });
+    
     // Input field event listeners
     inputField.addEventListener('input', handleTyping);
     inputField.addEventListener('paste', (e) => e.preventDefault()); // Prevent pasting
@@ -562,20 +568,57 @@ function initTypingChallenge() {
             });
     }
     
+    // Cancel the current challenge
+    function cancelChallenge() {
+        // Only cancel if a challenge is active
+        if (isTypingActive) {
+            // Reset typing state
+            resetTypingState();
+            
+            // Reset the challenge text display
+            challengeTextDisplay.textContent = "Your typing challenge will appear here";
+            
+            // Reset the challenge container styling
+            challengeContainer.classList.remove(
+                'border-primary/50', 
+                'dark:border-primary/50', 
+                'active-challenge',
+                'challenge-loading'
+            );
+            challengeContainer.classList.add('border-gray-700/50', 'dark:border-gray-700/50', 'border-gray-300/50');
+            
+            // Reset the start button text
+            startMissionButton.innerHTML = `
+                <span class="mr-2">Start Mission</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+            `;
+            
+            // Hide input field
+            inputField.classList.add('hidden');
+            
+            // Reset stats display
+            wpmDisplay.textContent = '--';
+            accuracyDisplay.textContent = '--%';
+            timeDisplay.textContent = '--:--';
+        }
+    }
+    
     // Show loading state while fetching prompt
     function showLoadingState() {
         challengeTextDisplay.innerHTML = `
             <div class="flex flex-col items-center justify-center">
                 <div class="mb-3">
-                    <div class="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin loading-spinner"></div>
                 </div>
-                <p>Generating your typing challenge...</p>
+                <p class="text-lg font-medium bg-gradient-to-r from-primary to-accent text-transparent bg-clip-text animate-pulse">Generating your typing challenge...</p>
             </div>
         `;
         
-        // Activate the challenge container
+        // Activate the challenge container with enhanced animation
         challengeContainer.classList.remove('border-gray-700/50', 'dark:border-gray-700/50', 'border-gray-300/50');
-        challengeContainer.classList.add('border-primary/50', 'dark:border-primary/50', 'active-challenge');
+        challengeContainer.classList.add('border-primary/50', 'dark:border-primary/50', 'active-challenge', 'challenge-loading');
         
         // Change button text
         startMissionButton.innerHTML = `
@@ -593,56 +636,87 @@ function initTypingChallenge() {
     function initializeChallenge(prompt) {
         totalChars = prompt.length;
         
-        // Format the challenge text with character spans
-        // We'll wrap each word to prevent cutting off words at the edge
-        const words = prompt.split(' ');
-        let formattedText = '';
+        // Remove loading animation
+        challengeContainer.classList.remove('challenge-loading');
         
-        words.forEach((word, wordIndex) => {
-            // Process each character in the word
-            const wordChars = word.split('').map(char => {
-                return `<span class="character">${char}</span>`;
-            }).join('');
-            
-            // Add the word with its characters
-            formattedText += `<span class="word">${wordChars}</span>`;
-            
-            // Add space after word (except for the last word)
-            if (wordIndex < words.length - 1) {
-                formattedText += `<span class="character space">·</span>`;
-            }
-        });
-        
-        // Update the challenge text display
-        challengeTextDisplay.innerHTML = formattedText;
-        
-        // Change button text to "Restart Mission"
-        startMissionButton.innerHTML = `
-            <span class="mr-2">Restart Mission</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
+        // First show a countdown animation
+        challengeTextDisplay.innerHTML = `
+            <div class="flex flex-col items-center justify-center w-full h-full">
+                <div class="text-5xl font-bold text-primary countdown-number">3</div>
+            </div>
         `;
         
-        // Re-enable the button
-        startMissionButton.disabled = false;
-        
-        // Clear input field and focus it
-        inputField.value = '';
-        inputField.classList.remove('hidden');
-        inputField.focus();
-        
-        // Reset stats display
-        wpmDisplay.textContent = '0';
-        accuracyDisplay.textContent = '100%';
-        timeDisplay.textContent = '0:00';
-        
-        // Set typing as active
-        isTypingActive = true;
-        
-        // Start the timer
-        startTime = new Date();
-        typingInterval = setInterval(updateStats, 1000);
+        // Countdown sequence
+        setTimeout(() => {
+            challengeTextDisplay.innerHTML = `
+                <div class="flex flex-col items-center justify-center w-full h-full">
+                    <div class="text-5xl font-bold text-primary countdown-number">2</div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                challengeTextDisplay.innerHTML = `
+                    <div class="flex flex-col items-center justify-center w-full h-full">
+                        <div class="text-5xl font-bold text-primary countdown-number">1</div>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    // Format the challenge text with character spans and animation classes
+                    // We'll wrap each word to prevent cutting off words at the edge
+                    const words = prompt.split(' ');
+                    let formattedText = '';
+                    
+                    words.forEach((word, wordIndex) => {
+                        // Process each character in the word
+                        const wordChars = word.split('').map(char => {
+                            return `<span class="character character-reveal">${char}</span>`;
+                        }).join('');
+                        
+                        // Add the word with its characters
+                        formattedText += `<span class="word">${wordChars}</span>`;
+                        
+                        // Add space after word (except for the last word)
+                        if (wordIndex < words.length - 1) {
+                            formattedText += `<span class="character space character-reveal">·</span>`;
+                        }
+                    });
+                    
+                    // Update the challenge text display
+                    challengeTextDisplay.innerHTML = formattedText;
+                    
+                    // Change button text to "Restart Mission"
+                    startMissionButton.innerHTML = `
+                        <span class="mr-2">Restart Mission</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    `;
+                    
+                    // Re-enable the button
+                    startMissionButton.disabled = false;
+                    
+                    // Clear input field and focus it after a short delay to allow animation to complete
+                    setTimeout(() => {
+                        inputField.value = '';
+                        inputField.classList.remove('hidden');
+                        inputField.focus();
+                        
+                        // Reset stats display
+                        wpmDisplay.textContent = '0';
+                        accuracyDisplay.textContent = '100%';
+                        timeDisplay.textContent = '0:00';
+                        
+                        // Set typing as active
+                        isTypingActive = true;
+                        
+                        // Start the timer
+                        startTime = new Date();
+                        typingInterval = setInterval(updateStats, 1000);
+                    }, 500);
+                }, 1000);
+            }, 1000);
+        }, 1000);
     }
     
     // Fetch dynamic prompt from ChatGPT API
@@ -1262,15 +1336,29 @@ function initNavigation() {
     const screens = document.querySelectorAll('.screen-container');
     const mainContent = document.querySelector('.container');
     
-    // Also handle the buttons in the bottom panel
+    // Bottom panel button events - these buttons don't exist in the current HTML
+    // So we'll remove these references to avoid errors
+    /*
     const showLeaderboardBtn = document.getElementById('show-leaderboard');
     const showTrophiesBtn = document.getElementById('show-trophies');
+    
+    // Bottom panel button events
+    showLeaderboardBtn.addEventListener('click', () => {
+        document.getElementById('nav-leaderboard').click();
+    });
+    
+    showTrophiesBtn.addEventListener('click', () => {
+        document.getElementById('nav-trophies').click();
+    });
+    */
     
     // Navigation button click event
     navButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             // Get the target screen ID
             const targetId = btn.id.replace('nav-', '');
+            
+            console.log(`Navigating to: ${targetId}`);
             
             // Update active button
             navButtons.forEach(b => b.classList.remove('active'));
@@ -1287,21 +1375,19 @@ function initNavigation() {
                 screens.forEach(screen => {
                     if (screen.id === `${targetId}-screen`) {
                         screen.classList.remove('hidden');
+                        
+                        // If navigating to leaderboard, make sure it's updated
+                        if (targetId === 'leaderboard') {
+                            const activeFilter = document.querySelector('.leaderboard-filter.active');
+                            const filterType = activeFilter ? activeFilter.textContent.toLowerCase() : 'daily';
+                            updateLeaderboard(filterType);
+                        }
                     } else {
                         screen.classList.add('hidden');
                     }
                 });
             }
         });
-    });
-    
-    // Bottom panel button events
-    showLeaderboardBtn.addEventListener('click', () => {
-        document.getElementById('nav-leaderboard').click();
-    });
-    
-    showTrophiesBtn.addEventListener('click', () => {
-        document.getElementById('nav-trophies').click();
     });
 } 
 
@@ -1340,65 +1426,31 @@ function initLeaderboard() {
         const leaderboardData = localStorage.getItem('typeVelocity_leaderboard');
         
         if (!leaderboardData) {
-            // Create mock leaderboard data
-            const mockData = {
-                daily: generateMockLeaderboardData(10),
-                weekly: generateMockLeaderboardData(10),
-                'all-time': generateMockLeaderboardData(10)
-            };
+            console.log("Initializing leaderboard data...");
             
-            // Add current user to each leaderboard
+            // Create empty leaderboard structure with only current user
             const userData = loadUserData();
             const userEntry = {
                 id: 'current-user',
                 name: 'You',
                 level: userData.level,
-                wpm: userData.stats.bestWPM || Math.floor(Math.random() * 20) + 30,
-                accuracy: userData.stats.averageAccuracy || Math.floor(Math.random() * 10) + 85,
-                streak: userData.streak
+                wpm: userData.stats.bestWPM || 0,
+                accuracy: userData.stats.averageAccuracy || 0,
+                streak: userData.streak,
+                rank: 1
             };
             
-            // Insert user at a random position in each leaderboard
-            ['daily', 'weekly', 'all-time'].forEach(type => {
-                const position = Math.floor(Math.random() * mockData[type].length);
-                mockData[type].splice(position, 0, userEntry);
-                
-                // Re-rank everyone
-                mockData[type].forEach((entry, index) => {
-                    entry.rank = index + 1;
-                });
-            });
+            // Initialize empty leaderboards with just the current user
+            const initialData = {
+                daily: [userEntry],
+                weekly: [userEntry],
+                'all-time': [userEntry]
+            };
             
             // Save to localStorage
-            localStorage.setItem('typeVelocity_leaderboard', JSON.stringify(mockData));
+            localStorage.setItem('typeVelocity_leaderboard', JSON.stringify(initialData));
+            console.log("Leaderboard data initialized:", initialData);
         }
-    }
-    
-    // Generate mock leaderboard data
-    function generateMockLeaderboardData(count) {
-        const names = [
-            'SpeedTyper', 'KeyMaster', 'TypeNinja', 'WordWizard', 
-            'SwiftKeys', 'RapidTypist', 'CodeTyper', 'FlashFingers',
-            'TypeLord', 'KeyboardKing', 'TypeQueen', 'VelocityViper',
-            'QuickType', 'TypeHero', 'KeyNinja', 'WordRacer'
-        ];
-        
-        const data = [];
-        
-        for (let i = 0; i < count; i++) {
-            data.push({
-                id: `user-${i}`,
-                name: names[Math.floor(Math.random() * names.length)],
-                rank: i + 1,
-                level: Math.floor(Math.random() * 20) + 1,
-                wpm: Math.floor(Math.random() * 50) + 40,
-                accuracy: Math.floor(Math.random() * 15) + 85,
-                streak: Math.floor(Math.random() * 10)
-            });
-        }
-        
-        // Sort by WPM
-        return data.sort((a, b) => b.wpm - a.wpm);
     }
     
     // Update leaderboard display
@@ -1406,10 +1458,22 @@ function initLeaderboard() {
         // Get leaderboard data
         const leaderboardData = JSON.parse(localStorage.getItem('typeVelocity_leaderboard'));
         
-        if (!leaderboardData) return;
+        console.log("Updating leaderboard with data:", leaderboardData);
+        
+        if (!leaderboardData) {
+            console.error("No leaderboard data found!");
+            // Re-initialize data if it's missing
+            initLeaderboardData();
+            return updateLeaderboard(filterType); // Try again after initialization
+        }
         
         // Get data for current filter
         const data = leaderboardData[filterType];
+        
+        if (!data || !Array.isArray(data)) {
+            console.error(`Invalid data for filter type: ${filterType}`);
+            return;
+        }
         
         // Clear table
         leaderboardTableBody.innerHTML = '';
@@ -1467,14 +1531,6 @@ function initLeaderboard() {
                 leaderboardData[type][userIndex].accuracy = Math.round((leaderboardData[type][userIndex].accuracy + accuracy) / 2);
                 leaderboardData[type][userIndex].level = userData.level;
                 leaderboardData[type][userIndex].streak = userData.streak;
-                
-                // Re-sort leaderboard
-                leaderboardData[type].sort((a, b) => b.wpm - a.wpm);
-                
-                // Re-rank everyone
-                leaderboardData[type].forEach((entry, index) => {
-                    entry.rank = index + 1;
-                });
             }
         });
         
